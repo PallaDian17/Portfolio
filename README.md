@@ -2,7 +2,7 @@
 
 AI Creative Technologist. I build the AI workflows ecommerce brands use to create images and video at scale.
 
-Live site: https://palladian17.github.io/portfolio/
+Live site: https://palladian17.github.io/Portfolio/
 
 - `index.html` — home: reel-ring loader that opens into a 3D carousel hero, selected work, workflows, about, contact
 - `collection.html` — every finished film and still, hung at depths in one room
