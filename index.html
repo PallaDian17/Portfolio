@@ -566,6 +566,12 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
 /* formats cell: real frames, not empty boxes */
 .ratios i{background-size:cover;background-position:center;box-shadow:0 10px 24px -12px rgba(0,0,0,.4)}
 .ratios figure b{color:#21262B;font-weight:500}
+/* one justified row: every frame shares a height, widths follow the aspect ratio, the row fills the card */
+.ratios{display:flex;flex-wrap:nowrap;align-items:flex-start;gap:14px;width:100%}
+.ratios figure{flex:var(--ar) 1 0%;min-width:0}
+.ratios i{width:100%;height:auto;aspect-ratio:var(--ar);border-radius:12px}
+.ratios figure span{display:flex;flex-direction:column;gap:2px;white-space:nowrap;overflow:hidden}
+@media (max-width:560px){ .ratios{flex-wrap:wrap;row-gap:18px} .ratios figure:last-child{flex-basis:100%} }
 /* phones: hero copy and both CTAs fit the first screen */
 @media (max-width:900px){
   .hero3d{height:46svh}
@@ -973,10 +979,10 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
         <div class="cell c-ratio" data-rise>
           <h3>Shipped in every placement</h3>
           <div class="ratios">
-            <figure><i role="img" aria-label="Neeman's loafer frame, 9:16" style="width:54px;height:96px;background-image:url(clips/loafer.jpg)"></i><span><b>9:16</b> Neeman's</span></figure>
-            <figure><i role="img" aria-label="Mufti catalogue frame, 4:5" style="width:77px;height:96px;background-image:url(clips/mf1.jpg)"></i><span><b>4:5</b> Mufti</span></figure>
-            <figure><i role="img" aria-label="Catalogue shot, 3:4" style="width:72px;height:96px;background-image:url(workflow/catalog/01.jpg)"></i><span><b>3:4</b> Catalog</span></figure>
-            <figure><i role="img" aria-label="Westside film frame, 16:9" style="width:171px;height:96px;background-image:url(clips/westside.jpg)"></i><span><b>16:9</b> Westside, spec</span></figure>
+            <figure style="--ar:0.5625"><i role="img" aria-label="Neeman's loafer frame, 9:16" style="background-image:url(clips/loafer.jpg)"></i><span><b>9:16</b> Neeman's</span></figure>
+            <figure style="--ar:0.8"><i role="img" aria-label="Mufti catalogue frame, 4:5" style="background-image:url(clips/mf1.jpg)"></i><span><b>4:5</b> Mufti</span></figure>
+            <figure style="--ar:0.75"><i role="img" aria-label="Catalogue shot, 3:4" style="background-image:url(workflow/catalog/01.jpg)"></i><span><b>3:4</b> Catalog</span></figure>
+            <figure style="--ar:1.7778"><i role="img" aria-label="Westside film frame, 16:9" style="background-image:url(clips/westside.jpg)"></i><span><b>16:9</b> Westside, spec</span></figure>
           </div>
         </div>
       </div>

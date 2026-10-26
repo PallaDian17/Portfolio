@@ -1,6 +1,6 @@
 # Ashish Pallathery — portfolio
 
-AI Creative Technologist. I build the AI workflows ecommerce brands use to create images and video at scale.
+AI Creative Technologist. I build AI workflows to generate AI videos and images at scale.
 
 Live site: https://palladian17.github.io/Portfolio/
 
