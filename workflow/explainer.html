@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>For Real: how it was made</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* A 1920x1080 stage that scales to whatever box it sits in. Every move is on one GSAP timeline so it can be
+   played, scrubbed by a parent page, or stepped frame by frame for the MP4 render. */
+:root{--ink:#0B0B0D;--fg:#EDEDEA;--muted:#A6A6AE;--line:#26272D;--accent:#FF5B2E;--card:#141518;
+  --display:'Geist',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,Menlo,monospace}
+html,body{margin:0;height:100%;background:var(--ink);overflow:hidden}
+body{font-family:var(--display);color:var(--fg);-webkit-font-smoothing:antialiased}
+#fit{position:absolute;inset:0;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;overflow:hidden;background:var(--ink);transform-origin:50% 50%}
+.abs{position:absolute}
+.hide{visibility:hidden;opacity:0}
+
+/* dot grid like a node canvas */
+#grid{inset:0;background-image:radial-gradient(rgba(255,255,255,.085) 1.2px,transparent 1.4px);background-size:36px 36px;opacity:0}
+#vignette{inset:0;background:radial-gradient(70% 60% at 50% 50%,transparent,rgba(11,11,13,.55) 80%)}
+
+/* S0 title */
+#s0{inset:0}
+#s0 .bg{inset:0;background:#000}
+#s0 .bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;filter:saturate(1.05)}
+#s0 .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,11,13,.92) 30%,rgba(11,11,13,.35) 65%,rgba(11,11,13,.1))}
+#s0 .copy{left:120px;top:0;height:100%;display:flex;flex-direction:column;justify-content:center;gap:28px;width:1100px}
+.kicker{font-family:var(--mono);font-size:18px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kicker b{color:var(--accent);font-weight:500}
+#s0 h1{margin:0;font-size:148px;line-height:.92;letter-spacing:-.05em;font-weight:800}
+#s0 h1 .ln{display:block;overflow:hidden;padding-bottom:.06em}
+#s0 h1 .ln>span{display:block}
+#s0 h1 em{font-style:normal;color:var(--accent)}
+#s0 p{margin:0;font-size:30px;color:var(--muted);max-width:28ch;line-height:1.35}
+#s0 .phone{right:160px;top:90px;width:506px;height:900px;border-radius:36px;overflow:hidden;box-shadow:0 60px 140px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.08)}
+#s0 .phone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* graph */
+#graph{left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#wires{position:absolute;inset:0;width:1920px;height:1080px;overflow:visible}
+#wires path{fill:none;stroke:#5B6CFF;stroke-opacity:.55;stroke-width:1.6}
+.node{position:absolute;border-radius:5px;overflow:hidden;background:#1E1F25;box-shadow:0 0 0 1px rgba(255,255,255,.14);transform-origin:50% 50%}
+.node img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.node.src{background:#2A2B31}
+.node.ast{background:#17181C;box-shadow:0 0 0 1px rgba(255,91,46,.75)}
+.node.ast::before{content:"";position:absolute;left:5px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.node.ast::after{content:"";position:absolute;left:19px;right:5px;top:8px;height:3px;background:#3B3C44;box-shadow:0 6px 0 #3B3C44,0 12px 0 #3B3C44}
+.node.var{background:#1C1D22}
+.node.lst{background:#111A26;box-shadow:0 0 0 1px rgba(91,108,255,.6)}
+.node.lst::before{content:"";position:absolute;left:5px;top:5px;right:5px;height:2px;background:#5B6CFF;box-shadow:0 5px 0 #5B6CFF,0 10px 0 #5B6CFF,0 15px 0 #5B6CFF}
+.node.film{background:#000;box-shadow:0 0 0 2px var(--accent)}
+.node.on{box-shadow:0 0 0 2px var(--accent),0 0 28px rgba(255,91,46,.45)}
+.collab{position:absolute;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transform:translateX(-50%)}
+.collab b{display:block;font-size:22px;color:var(--fg);font-weight:500;letter-spacing:-.02em;text-transform:none}
+
+/* stats */
+#stats{right:120px;top:84px;display:flex;gap:40px}
+#stats div{display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+#stats b{font-family:var(--mono);font-weight:500;font-size:64px;letter-spacing:-.04em;line-height:1}
+#stats b.hot{color:var(--accent)}
+#stats span{font-size:16px;color:var(--muted)}
+
+/* captions */
+.cap{position:absolute;left:120px;bottom:96px;width:960px;display:flex;flex-direction:column;gap:14px}
+.cap .ix{font-family:var(--mono);font-size:18px;color:var(--accent);letter-spacing:.06em}
+.cap h2{margin:0;font-size:64px;line-height:1;letter-spacing:-.04em;font-weight:700}
+.cap p{margin:0;font-size:26px;line-height:1.4;color:var(--muted);max-width:40ch}
+.cap .wrap{overflow:hidden}
+.cap .wrap>*{visibility:hidden;opacity:0}
+.cap.top{bottom:auto;top:84px}
+
+/* card */
+#card{left:1120px;top:120px;width:680px;height:840px;border-radius:26px;background:var(--card);box-shadow:0 0 0 1px rgba(255,255,255,.08),0 50px 120px rgba(0,0,0,.6);overflow:hidden}
+.pane{position:absolute;inset:0;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;gap:18px}
+.pane .hd{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:600}
+.pane .hd i{width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block}
+.pane .hd .st{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips span{font-family:var(--mono);font-size:13px;color:#C8C8CE;background:rgba(255,255,255,.06);border-radius:999px;padding:6px 11px}
+/* S2 sources fan */
+#p2 .fan{position:relative;flex:1}
+#p2 .fan img{position:absolute;left:50%;top:50%;width:300px;height:534px;object-fit:cover;border-radius:16px;transform:translate(-50%,-50%);box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.1)}
+/* S3 assistant */
+#p3 .prompt{flex:1;background:#0F1013;border-radius:16px;padding:22px;font-family:var(--mono);font-size:21px;line-height:1.55;color:#DADADF;position:relative;overflow:hidden}
+#p3 .prompt .cur{display:inline-block;width:11px;height:24px;background:var(--accent);vertical-align:-4px;margin-left:2px}
+#p3 .in{display:flex;gap:10px;align-items:center}
+#p3 .in img{width:56px;height:96px;object-fit:cover;border-radius:8px}
+#p3 .in span{font-size:15px;color:var(--muted)}
+#p3 .out{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:14px;color:var(--accent)}
+#p3 .out i{flex:1;height:1px;background:linear-gradient(90deg,var(--accent),transparent)}
+/* S4 generator */
+#p4 .frame{position:relative;flex:1;border-radius:18px;overflow:hidden;background:#000}
+#p4 .frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#p4 .ref{position:absolute;left:14px;bottom:14px;display:flex;gap:6px;align-items:center;background:rgba(11,11,13,.7);border-radius:12px;padding:6px 10px 6px 6px;font-family:var(--mono);font-size:12px;color:#C8C8CE}
+#p4 .ref img{position:static;width:34px;height:58px;border-radius:6px}
+#p4 .cnt{position:absolute;right:14px;top:14px;font-family:var(--mono);font-size:14px;background:rgba(11,11,13,.7);border-radius:999px;padding:6px 10px}
+/* S5 angles */
+#p5 .grid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:8px}
+#p5 .grid div{border-radius:10px;overflow:hidden;background:#000;transform-origin:50% 50%}
+#p5 .grid img{width:100%;height:100%;object-fit:cover;display:block}
+#p5 .list{display:flex;gap:8px;align-items:center;font-family:var(--mono);font-size:13px;color:#C8C8CE}
+#p5 .list i{width:38px;height:28px;border-radius:5px;background:#111A26;box-shadow:0 0 0 1px rgba(91,108,255,.6);display:block}
+/* S6 proof + film */
+#p6{padding:0}
+#p6 .shot{position:absolute;inset:0}
+#p6 .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top}
+#p6 .lbl{position:absolute;left:20px;top:20px;font-family:var(--mono);font-size:13px;background:rgba(11,11,13,.75);border-radius:999px;padding:7px 12px;color:#fff}
+
+/* film strip for the ending */
+#strip{left:0;top:0;width:1920px;height:1080px}
+#strip .f{position:absolute;top:90px;width:506px;height:900px;border-radius:30px;overflow:hidden;box-shadow:0 50px 120px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.08)}
+#strip .f img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#end{inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center}
+#end h2{margin:0;font-size:120px;letter-spacing:-.05em;line-height:.95;font-weight:800}
+#end h2 em{font-style:normal;color:var(--accent)}
+#end p{margin:0;font-size:28px;color:var(--muted)}
+#end .row{display:flex;gap:34px;font-family:var(--mono);font-size:18px;color:#C8C8CE}
+#end .row b{color:var(--fg);font-weight:500}
+</style>
+</head>
+<body>
+<div id="fit"><div id="stage">
+  <div id="grid" class="abs"></div>
+
+  <div id="graph" class="abs">
+    <svg id="wires" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="nodes"></div>
+    <div id="labels"></div>
+  </div>
+  <div id="vignette" class="abs" style="pointer-events:none;opacity:0"></div>
+
+  <div id="stats" class="abs hide">
+    <div><b class="hot" id="nNodes">0</b><span>nodes</span></div>
+    <div><b id="nWires">0</b><span>connections</span></div>
+    <div><b id="nAst">0</b><span>prompt assistants</span></div>
+  </div>
+
+  <div id="card" class="abs hide">
+    <div class="pane" id="p2">
+      <div class="hd"><i></i>Sources<span class="st">41 frames</span></div>
+      <div class="chips"><span>studio product shots</span><span>location plates</span><span>pose references</span></div>
+      <div class="fan"></div>
+    </div>
+    <div class="pane hide" id="p3">
+      <div class="hd"><i></i>Assistant #1<span class="st">Gemini 3.1 Pro</span></div>
+      <div class="in"><img src="img/CHkpKWSEEy.jpg" alt=""><span>@image1 · studio reference</span></div>
+      <div class="prompt"><span id="type"></span><span class="cur"></span></div>
+      <div class="out">generated_prompt<i></i>Image Generator #1</div>
+    </div>
+    <div class="pane hide" id="p4">
+      <div class="hd"><i></i>Image Generator #9<span class="st">cinematic · 9:16 · 4K</span></div>
+      <div class="frame">
+        <img id="genImg" src="img/jSO5lB9LD0.jpg" alt="">
+        <div class="cnt" id="genCnt">01 / 25</div>
+        <div class="ref"><img src="img/SONHK3pUb8.jpg" alt="">reference locked</div>
+      </div>
+      <div class="chips"><span>Nano Banana 2</span><span>Imagen</span><span>prompt from Assistant</span></div>
+    </div>
+    <div class="pane hide" id="p5">
+      <div class="hd"><i></i>Variations #4<span class="st">angles · 9 outputs</span></div>
+      <div class="grid" id="angles"></div>
+      <div class="list"><i></i>List #4 accumulates the keepers into a shot list</div>
+    </div>
+    <div class="pane hide" id="p6">
+      <div class="shot"><img src="img/board-overview.jpg" alt=""><span class="lbl">the actual board · Magnific Spaces</span></div>
+      <div class="shot hide" id="shot2"><img src="img/board-chain-29.jpg" alt=""><span class="lbl">prompt → generator → angles → list</span></div>
+    </div>
+  </div>
+
+  <div id="caps" class="abs" style="inset:0;pointer-events:none"></div>
+
+  <div id="strip" class="abs hide"></div>
+  <div id="end" class="abs hide">
+    <h2>Shop <em>the drop.</em></h2>
+    <p>27 seconds. Every look AI-shot on location. One board.</p>
+    <div class="row"><span><b>117</b> nodes</span><span><b>107</b> connections</span><span><b>23</b> assistants</span><span><b>25</b> generators</span><span><b>90</b> angles</span></div>
+    <p style="font-size:20px;margin-top:40px">Built in Magnific Spaces · Directed by Ashish Pallathery</p>
+  </div>
+
+  <div id="s0" class="abs">
+    <div class="bg abs"><img src="film/f2.jpg" alt=""></div>
+    <div class="copy abs">
+      <div class="kicker"><b>For Real</b> · ethnicwear drop · 2026</div>
+      <h1><span class="ln"><span>How it</span></span><span class="ln"><span>was <em>made.</em></span></span></h1>
+      <p>One node-based board in Magnific Spaces. From studio stills to a 27-second collection film.</p>
+    </div>
+    <div class="phone abs"><img src="film/f0.jpg" alt=""></div>
+  </div>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function(){
+  var q = new URLSearchParams(location.search);
+  var SRC = ['CHkpKWSEEy','SONrKhJUb8','SONHK3pUb8','CHkm2ypEEy','e8vT7LrdqL','SO6wRQjUb8','VdtDv9ZMMU','fFKmqUyCDY','y6A4Y5fPW9','swPrJnJl8e','ohEpPgP829','IaQXCLTtvE','tfFBFA6mZJ','J9RsxjFOq4','1swqMAHr4r','LUykd08swO'];
+  var GEN = ['jSO5lB9LD0','WMXGuEpcXe','1s7jf6pr4r','fFkuyNwCDY','jSyl5umLD0','iAcAn5a3uK','1swvQXer4r','J9Rl6miOq4','MXtcQNdDCm','brgkOR05Y2','ohutShg829','VdteDZ8MMU','hEbE7P6vqL','iAWl79l3uK','aQ5tJZHfSh'];
+  var VAR = ['sw4w4drl8e','YVXf2dAWeC','BmE1WpZoQR','xgOgKzljfW','SONxErTUb8','CH1HBtKEEy','ohuhD5F829','e8ambzCdqL','fFkUXPkCDY','8vuWC9fIrU'];
+  var LST = ['xgJC7xajfW','CHkeKCWEEy','poh2mpOehw','8vuWE8OIrU','gJ9H4gpSXO','PiAx2Pe42C','dIaGvdHXSL','swPQysyl8e','SO6OxPtUb8'];
+  var img = function(k){ return 'img/'+k+'.jpg'; };
+
+  /* ---------- scale the 1920x1080 stage into the viewport ---------- */
+  var stage = document.getElementById('stage');
+  function fit(){ var s = Math.min(innerWidth/1920, innerHeight/1080); stage.style.transform = 'translate(-50%,-50%) scale('+s+')'; }
+  fit(); addEventListener('resize', fit);
+
+  /* ---------- the graph: the real board, column by column ---------- */
+  var COLS = [
+    {key:'src', n:41, x:150, w:20, h:34, label:'Sources', sub:'41', split:true},
+    {key:'ast', n:23, x:500, w:40, h:26, label:'Prompt assistants', sub:'23'},
+    {key:'gen', n:25, x:840, w:26, h:46, label:'Image generators', sub:'25'},
+    {key:'var', n:10, x:1180, w:30, h:30, label:'Angle variations', sub:'10'},
+    {key:'lst', n:10, x:1480, w:34, h:24, label:'Shot lists', sub:'10'},
+    {key:'film', n:1, x:1780, w:44, h:78, label:'The film', sub:'1'}
+  ];
+  var nodesEl = document.getElementById('nodes'), wiresEl = document.getElementById('wires'), labelsEl = document.getElementById('labels');
+  var N = {}; // key -> array of {el,x,y,w,h}
+  COLS.forEach(function(c){
+    N[c.key] = [];
+    var top = 120, bottom = 940;
+    for (var i=0;i<c.n;i++){
+      var el = document.createElement('div'); el.className = 'node '+c.key;
+      var x = c.x, y;
+      if (c.split){ var half = Math.ceil(c.n/2), col = i < half ? 0 : 1, j = col ? i-half : i, cnt = col ? c.n-half : half;
+        x = c.x + (col ? 40 : -40); y = top + (bottom-top) * (cnt===1 ? .5 : j/(cnt-1)); }
+      else y = c.n===1 ? 540 : top + (bottom-top) * i/(c.n-1);
+      var pic = null;
+      if (c.key==='src') pic = SRC[i % SRC.length];
+      if (c.key==='gen') pic = GEN[i % GEN.length];
+      if (c.key==='var') pic = VAR[i % VAR.length];
+      if (c.key==='lst' && i<LST.length) pic = null;
+      if (c.key==='film') pic = null;
+      if (pic){ var im = document.createElement('img'); im.src = img(pic); im.alt=''; el.appendChild(im); }
+      if (c.key==='film'){ var fm = document.createElement('img'); fm.src='film/f4.jpg'; fm.alt=''; el.appendChild(fm); }
+      el.style.left = (x - c.w/2)+'px'; el.style.top = (y - c.h/2)+'px'; el.style.width = c.w+'px'; el.style.height = c.h+'px';
+      nodesEl.appendChild(el);
+      N[c.key].push({el:el, x:x, y:y, w:c.w, h:c.h});
+    }
+    var lb = document.createElement('div'); lb.className='collab'; lb.style.left = c.x+'px'; lb.style.top = '986px';
+    lb.innerHTML = '<b>'+c.sub+'</b>'+c.label; labelsEl.appendChild(lb);
+  });
+  /* wiring that mirrors the board: assistants read sources, generators read an assistant prompt + a reference,
+     variations read a generator, lists accumulate a variation, the film reads the lists */
+  var wires = [];
+  function wire(a, b){
+    var p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    var x1 = a.x + a.w/2, y1 = a.y, x2 = b.x - b.w/2, y2 = b.y, dx = Math.max(40, (x2-x1)*0.5);
+    p.setAttribute('d', 'M'+x1+' '+y1+' C'+(x1+dx)+' '+y1+' '+(x2-dx)+' '+y2+' '+x2+' '+y2);
+    wiresEl.appendChild(p); wires.push(p);
+  }
+  N.ast.forEach(function(a,i){ wire(N.src[Math.round(i*40/22)], a); if (i%3===0) wire(N.src[(Math.round(i*40/22)+20)%41], a); });
+  N.gen.forEach(function(g,i){ wire(N.ast[Math.round(i*22/24)], g); wire(N.src[(i*7)%41], g); });
+  N.var.forEach(function(v,i){ wire(N.gen[Math.round(i*24/9)], v); });
+  N.lst.forEach(function(l,i){ wire(N.var[i], l); });
+  wire(N.lst[4], N.film[0]); wire(N.lst[6], N.film[0]);
+  wires.forEach(function(p){ var L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; });
+
+  /* ---------- card content ---------- */
+  var fan = document.querySelector('#p2 .fan');
+  var fanImgs = SRC.slice(0,6).map(function(k){ var im=document.createElement('img'); im.src=img(k); im.alt=''; fan.appendChild(im); return im; });
+  var anglesEl = document.getElementById('angles');
+  var angleCells = LST.slice(0,9).map(function(k){ var d=document.createElement('div'); var im=document.createElement('img'); im.src=img(k); im.alt=''; d.appendChild(im); anglesEl.appendChild(d); return d; });
+  var strip = document.getElementById('strip');
+  var stripFrames = ['f1','f3','f5','end'].map(function(f,i){ var d=document.createElement('div'); d.className='f'; var im=document.createElement('img'); im.src='film/'+f+'.jpg'; im.alt=''; d.appendChild(im); strip.appendChild(d); return d; });
+
+  /* ---------- camera helper: put graph point (gx,gy) at screen (sx,sy) at scale s ---------- */
+  function cam(gx, gy, s, sx, sy){ return {x: sx - gx*s, y: sy - gy*s, scale: s}; }
+
+  /* ---------- captions: one block per stage so scrubbing in either direction stays correct ---------- */
+  var capsEl = document.getElementById('caps'), lastCap = null;
+  function caption(tl, at, ix, h, p, top){
+    var c = document.createElement('div'); c.className = 'cap' + (top ? ' top' : '');
+    c.innerHTML = '<div class="wrap"><div class="ix"></div></div><div class="wrap"><h2></h2></div><div class="wrap"><p></p></div>';
+    c.querySelector('.ix').textContent = ix; c.querySelector('h2').textContent = h; c.querySelector('p').textContent = p;
+    capsEl.appendChild(c);
+    var parts = c.querySelectorAll('.wrap > *');
+    if (lastCap) tl.to(lastCap, {yPercent:-110, autoAlpha:0, duration:.45, ease:'power3.in', stagger:.04}, at);
+    tl.fromTo(parts, {yPercent:110, autoAlpha:0}, {yPercent:0, autoAlpha:1, duration:.9, ease:'power4.out', stagger:.08, immediateRender:false}, at+.5);
+    lastCap = parts;
+  }
+  function swapPane(tl, at, show){
+    tl.to('#card .pane', {autoAlpha:0, duration:.35, ease:'power2.in'}, at);
+    tl.fromTo(show, {autoAlpha:0, y:16}, {autoAlpha:1, y:0, duration:.7, ease:'power3.out', immediateRender:false}, at+.35);
+  }
+  /* highlight ring on/off, staggered, scrub-safe (attr sets record their start value) */
+  function hl(tl, at, list, on, each){
+    list.forEach(function(n, i){ tl.set(n.el, {attr:{class: n.el.className.replace(' on','') + (on ? ' on' : '')}}, at + i*(each||0)); });
+  }
+
+  /* ---------- the timeline ---------- */
+  var tl = gsap.timeline({paused:true, defaults:{ease:'power3.out'}});
+  var typed = {n:0}, TXT = 'Full body shot of woman adjusting her hair, slight wind, strong light. Rustic Indian handicraft shop exterior with woven baskets hanging overhead from bamboo rods. Warm earthy tones, subtle blue wooden frames, dusty uneven ground, strong depth layering.';
+  var genIx = {i:0};
+  var count = {n:0, w:0, a:0};
+
+  /* S0 title: 0 - 3.5 */
+  tl.from('#s0 .bg img', {scale:1.08, duration:3.6, ease:'none'}, 0);
+  tl.from('#s0 .kicker', {y:16, autoAlpha:0, duration:.8}, .1);
+  tl.from('#s0 h1 .ln > span', {yPercent:110, duration:1.1, ease:'power4.out', stagger:.12}, .25);
+  tl.from('#s0 p', {y:18, autoAlpha:0, duration:.9}, .7);
+  tl.from('#s0 .phone', {y:60, autoAlpha:0, duration:1.3, ease:'power4.out'}, .3);
+  tl.to('#s0 .phone', {y:-40, duration:3, ease:'none'}, .5);
+  tl.to('#s0', {autoAlpha:0, duration:.7, ease:'power2.inOut'}, 3.0);
+
+  /* S1 constellation: 3.5 - 10 */
+  tl.set('#graph', cam(960, 540, .9, 960, 600), 3.3);
+  tl.to('#grid', {opacity:1, duration:1}, 3.3);
+  tl.to('#vignette', {opacity:1, duration:1}, 3.3);
+  tl.from('.node', {scale:0, autoAlpha:0, duration:.7, ease:'power3.out', stagger:{each:.012, from:'start'}}, 3.5);
+  tl.to(wires, {strokeDashoffset:0, duration:1.6, ease:'power2.inOut', stagger:{each:.012}}, 3.9);
+  tl.from('.collab', {y:14, autoAlpha:0, duration:.8, stagger:.08}, 4.4);
+  tl.fromTo('#stats', {autoAlpha:0, y:-14}, {autoAlpha:1, y:0, duration:.8, immediateRender:false}, 4.6);
+  tl.to(count, {n:117, w:107, a:23, duration:2.2, ease:'power2.out', onUpdate:function(){
+    document.getElementById('nNodes').textContent = Math.round(count.n);
+    document.getElementById('nWires').textContent = Math.round(count.w);
+    document.getElementById('nAst').textContent = Math.round(count.a);
+  }}, 4.6);
+  caption(tl, 4.2, 'The board', 'One board. Six stages.', 'Every image in the film traces back through these wires: a source, a prompt, a generator, a pick.', true);
+
+  /* S2 sources: 10 - 15 */
+  tl.to('#graph', Object.assign(cam(150, 540, 2.6, 560, 540), {duration:1.5, ease:'power3.inOut'}), 9.6);
+  tl.to('#stats', {autoAlpha:0, y:-10, duration:.5}, 9.6);
+  tl.to('.collab', {autoAlpha:0, duration:.4}, 9.6);
+  hl(tl, 10.4, N.src, true, .02);
+  tl.fromTo('#card', {autoAlpha:0, x:40}, {autoAlpha:1, x:0, duration:.9, immediateRender:false}, 10.3);
+  tl.set('#p2', {autoAlpha:1}, 10.3);
+  tl.from(fanImgs, {y:80, autoAlpha:0, duration:.9, ease:'power4.out', stagger:.08}, 10.6);
+  tl.to(fanImgs, {rotation:function(i){ return (i-2.5)*9; }, x:function(i){ return (i-2.5)*62; }, y:function(i){ return Math.abs(i-2.5)*10; }, duration:1.2, ease:'power3.inOut'}, 11.4);
+  caption(tl, 10.2, '01 / 05', 'Sources', '41 frames go in: white-studio product shots of each kurta set, plus location plates and pose references.');
+
+  /* S3 prompt assistants: 15 - 21 */
+  tl.to('#graph', Object.assign(cam(500, 540, 2.6, 560, 540), {duration:1.4, ease:'power3.inOut'}), 15);
+  hl(tl, 15, N.src, false);
+  hl(tl, 15.6, N.ast, true, .03);
+  swapPane(tl, 15.2, '#p3');
+  tl.set(typed, {n:0}, 15.9);
+  tl.to(typed, {n:TXT.length, duration:4.2, ease:'none', onUpdate:function(){ document.getElementById('type').textContent = TXT.slice(0, Math.round(typed.n)); }}, 15.9);
+  tl.fromTo('#p3 .out', {autoAlpha:0, x:-10}, {autoAlpha:1, x:0, duration:.6, immediateRender:false}, 19.4);
+  caption(tl, 15.4, '02 / 05', 'Prompt assistants', '23 Claude Opus 4.5 and Gemini 3.1 Pro nodes read the reference and write the shot: framing, light, set, pose.');
+
+  /* S4 generators: 21 - 27 */
+  tl.to('#graph', Object.assign(cam(840, 540, 2.6, 560, 540), {duration:1.4, ease:'power3.inOut'}), 21);
+  hl(tl, 21, N.ast, false);
+  hl(tl, 21.6, N.gen, true, .03);
+  swapPane(tl, 21.2, '#p4');
+  tl.set(genIx, {i:0}, 21.8);
+  tl.to(genIx, {i:GEN.length-1, duration:4.4, ease:'none', snap:'i', onUpdate:function(){
+    var k = Math.round(genIx.i); var el = document.getElementById('genImg'); var want = img(GEN[k]);
+    if (el.getAttribute('src') !== want) el.setAttribute('src', want);
+    document.getElementById('genCnt').textContent = String(k+1).padStart(2,'0')+' / 25';
+  }}, 21.8);
+  caption(tl, 21.4, '03 / 05', 'Image generators', '25 cinematic 9:16 renders at 4K, each locked to its studio reference so the garment never drifts.');
+
+  /* S5 angles + lists: 27 - 32 */
+  tl.to('#graph', Object.assign(cam(1330, 540, 2.3, 560, 540), {duration:1.4, ease:'power3.inOut'}), 27);
+  hl(tl, 27, N.gen, false);
+  hl(tl, 27.6, N.var, true, .05);
+  hl(tl, 28.4, N.lst, true, .05);
+  swapPane(tl, 27.2, '#p5');
+  tl.from(angleCells, {scale:.6, autoAlpha:0, duration:.7, ease:'power3.out', stagger:{each:.07, grid:[3,3], from:'center'}}, 27.8);
+  tl.from('#p5 .list', {autoAlpha:0, x:-12, duration:.6}, 29.6);
+  caption(tl, 27.4, '04 / 05', 'Angles, then shot lists', '10 variation nodes turn every hero frame into 9 camera angles. Lists keep the ones worth cutting.');
+
+  /* S6 the film: 32 - 38 */
+  tl.to('#graph', Object.assign(cam(1780, 540, 2.3, 560, 540), {duration:1.4, ease:'power3.inOut'}), 32);
+  hl(tl, 32, N.var.concat(N.lst), false);
+  hl(tl, 32.6, N.film, true);
+  swapPane(tl, 32.2, '#p6');
+  tl.fromTo('#shot2', {autoAlpha:0}, {autoAlpha:1, duration:.6, immediateRender:false}, 34.4);
+  caption(tl, 32.4, '05 / 05', 'The film', 'Keepers go to the video generator and the cut. 27 seconds, every look shot on location without a location.');
+
+  /* ending: 37 - 43 */
+  tl.to(['#graph','#card','#caps','#grid','#vignette'], {autoAlpha:0, duration:.8, ease:'power2.inOut'}, 37);
+  tl.set('#strip', {autoAlpha:1}, 37.4);
+  tl.fromTo(stripFrames, {x:function(i){ return 1920 + i*560; }}, {x:function(i){ return 110 + i*450; }, duration:1.6, ease:'power4.out', stagger:.08, immediateRender:false}, 37.5);
+  tl.to(stripFrames, {x:function(i){ return 110 + i*450 - 120; }, duration:3, ease:'none'}, 39.1);
+  tl.to('#strip', {autoAlpha:0, duration:.7, ease:'power2.inOut'}, 41.4);
+  tl.fromTo('#end', {autoAlpha:0}, {autoAlpha:1, duration:.01, immediateRender:false}, 41.8);
+  tl.from('#end > *', {y:30, autoAlpha:0, duration:1, ease:'power4.out', stagger:.1}, 41.9);
+  tl.to({}, {duration:2.4}, 43);
+
+  window.__explainer = { tl: tl, duration: tl.duration() };
+  addEventListener('message', function(e){ var d = e.data; if (d && d.type === 'explainer:progress') tl.pause().progress(d.p); });
+  if (q.get('autoplay') === '1'){ tl.play(0); if (q.get('loop') === '1') tl.eventCallback('onComplete', function(){ tl.play(0); }); }
+  if (q.get('at')) tl.progress(parseFloat(q.get('at')));
+  document.documentElement.setAttribute('data-ready', '1');
+})();
+</script>
+</body>
+</html>
