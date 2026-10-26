@@ -1038,8 +1038,7 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
           <div><b>1</b><span>Film</span></div>
         </div>
         <div class="made-links">
-          <a class="btn btn-light" id="wfBoard" href="https://www.magnific.com/app/spaces/a163ba54-5ad1-4e8f-a0b4-eda44212c592" target="_blank" rel="noopener">Open the board</a>
-          <button class="btn btn-outline" type="button" id="wfFilm">Watch the finished film</button>
+          <button class="btn btn-light" type="button" id="wfFilm">Watch the finished film</button>
         </div>
       </div>
     </div>
@@ -1286,7 +1285,7 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
     });
     var box = document.getElementById('wfStats'); box.innerHTML = '';
     c.stats.forEach(function(x){ var d = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'); b.textContent = x[0]; sp.textContent = x[1]; d.appendChild(b); d.appendChild(sp); box.appendChild(d); });
-    var bd = document.getElementById('wfBoard'); bd.hidden = !c.board; if (c.board) bd.href = c.board;
+    var bd = document.getElementById('wfBoard'); if (bd){ bd.hidden = !c.board; if (c.board) bd.href = c.board; }
     var wfb = document.getElementById('wfFilm'); wfb.hidden = !c.film; wfb.textContent = c.filmLabel || '';
   }
   function paintRail(){
