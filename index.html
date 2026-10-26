@@ -295,6 +295,10 @@ a{color:inherit}
 .mail{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
 .mail-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .mail-addr{font-family:var(--mono);font-size:clamp(16px,1.6vw,20px);user-select:all;color:var(--accent)}
+.wa{display:inline-flex;align-items:center;gap:10px;min-height:44px;margin-top:-10px;color:var(--fg-dark);text-decoration:none;font-family:var(--mono);font-size:clamp(15px,1.4vw,18px)}
+.wa svg{flex:none;transition:transform .25s cubic-bezier(.23,1,.32,1)}
+.wa-num{user-select:all;border-bottom:1px solid transparent;transition:border-color .2s ease}
+@media (hover:hover) and (pointer:fine){ .wa:hover svg{transform:scale(1.08)} .wa:hover .wa-num{border-color:currentColor} }
 .btn-dark{background:#2A3036;color:var(--fg-dark);height:44px;padding:0 18px;font-size:14px}
 .btn-line{background:transparent;color:var(--fg-dark);box-shadow:inset 0 0 0 1.5px #4A525A;height:44px;padding:0 18px;font-size:14px}
 footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:#A9A9A9;border-top:1px solid var(--line-dark);padding-block:24px 40px}
@@ -700,9 +704,9 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
       </div>
       <div class="hx-band" id="hxBand">
         <div class="rise">
-          <h1>I build the AI workflows ecommerce brands use to <em>create images and video at scale.</em></h1>
+          <h1>I build AI workflows to generate <em>AI videos and images at scale.</em></h1>
           <div class="hx-sub">
-            <p>AI Creative Technologist at Quinn · ComfyUI, Claude, Seedance</p>
+            <p>Video Team Lead | AI Creative Technologist | Customer Success at Quinn</p>
             <a class="btn btn-solid" href="#work" data-jump>See the work</a>
             <a class="btn btn-ghost" href="resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
           </div>
@@ -985,9 +989,10 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
           <div class="talk-ink"><span id="talkTitle">Let's talk</span></div>
         </div>
         <div class="contact">
-          <p>Mumbai-based, open to relocation. Creative technologist roles in Europe, the US, Canada and India.</p>
+          <p>Mumbai/Bengaluru-based, open to relocation. Creative technologist roles in Europe, the US, Canada and India.</p>
           <div class="mail">
             <span class="mail-addr" id="addr">ashissj9@gmail.com</span>
+            <a class="wa" href="https://wa.me/918450960461" target="_blank" rel="noopener" aria-label="WhatsApp +91 84509 60461"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#25D366"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.05 21.8h-.01a9.8 9.8 0 0 1-5-1.37l-.36-.21-3.72.98 1-3.63-.24-.37a9.8 9.8 0 0 1-1.5-5.22c0-5.42 4.410-9.83 9.840-9.83 2.63 0 5.1 1.03 6.96 2.89a9.78 9.78 0 0 1 2.88 6.96c0 5.42-4.41 9.83-9.85 9.83zm8.38-18.2A11.76 11.76 0 0 0 12.05.13C5.5.13.17 5.46.17 12.01c0 2.09.55 4.14 1.59 5.94L.07 24l6.2-1.63a11.84 11.84 0 0 0 5.78 1.47h.01c6.55 0 11.88-5.330 11.88-11.88 0-3.17-1.24-6.16-3.48-8.4z"/></svg><span class="wa-num">+91 84509 60461</span></a>
             <div class="mail-row">
               <a class="btn btn-light" href="resume.pdf" target="_blank" rel="noopener" style="height:44px;padding:0 18px;font-size:14px">Resume (PDF)</a>
               <button class="btn btn-dark" id="copy" type="button">Copy email</button>
