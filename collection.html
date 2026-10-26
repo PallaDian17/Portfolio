@@ -283,7 +283,7 @@ a{color:inherit}
 <div class="top-blur" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
 <main>
-  <div class="space" id="space" aria-label="The collection, hung at nine depths">
+  <div class="space" id="space" aria-label="The collection, hung at depth">
     <div class="cam" id="cam"></div>
   </div>
   <div class="hud">
@@ -354,6 +354,7 @@ a{color:inherit}
   var PROCESS = [];
   var STILLS = [];
   ['f0','f1','f2','f3','f4','f5','f6','f7'].forEach(function(f, i){ STILLS.push({k:'still', id:'frame-'+f, title:'For Real — frame '+String(i+1).padStart(2,'0'), meta:'Film frame · 9:16 · For Real collection drop', ar:9/16, img:'workflow/film/'+f+'.jpg'}); });
+  [['01','full body, seated'],['02','waist-up, collar pull'],['03','back view'],['04','full body, step stool'],['05','three-quarter, bar stool']].forEach(function(t){ STILLS.push({k:'still', id:'catw-'+t[0], title:"Women's catalogue — "+t[1], meta:'ComfyUI + GPT Image 2.5 · 3:4 · one flat lay, five poses, one grey-card-matched backdrop', ar:900/1205, img:'workflow/catalog-w/'+t[0]+'.jpg'}); });
   ['1s7jf6pr4r','1swqMAHr4r','1swvQXer4r','8vuWE8OIrU','CHkm2ypEEy','J9Rl6miOq4','LUykd08swO','MXtcQNdDCm','PiAx2Pe42C','SO6OxPtUb8','SONHK3pUb8','VdteDZ8MMU','WMXGuEpcXe','aQ5tJZHfSh','dIaGvdHXSL','e8vT7LrdqL','gJ9H4gpSXO','hEbE7P6vqL','iAcAn5a3uK','jSO5lB9LD0','jSyl5umLD0','ohutShg829','swPQysyl8e','xgJC7xajfW']
     .forEach(function(f, i){ STILLS.push({k:'still', id:'gen-'+f, title:'For Real — look '+String(i+1).padStart(2,'0'), meta:'AI-generated on-location still · 9:16 · For Real', ar:9/16, img:'workflow/img/'+f+'.jpg'}); });
   ['Full body','Upper torso','Back','Half side','Close-up'].forEach(function(t, i){ var n = String(i+1).padStart(2,'0'); STILLS.push({k:'still', id:'cat-'+n, title:'Catalogue shot — '+t.toLowerCase(), meta:'ComfyUI + Nano Banana Pro · 3:4 · one flat lay in, five shots out', ar:900/1206, img:'workflow/catalog/'+n+'.jpg'}); });

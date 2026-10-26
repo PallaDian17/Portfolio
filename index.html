@@ -684,7 +684,7 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
           <button class="drop-item" type="button" data-made="forreal"><img src="workflow/poster.jpg" alt="" width="72" height="54" loading="lazy"><span class="t"><b>For Real film</b><span>Node workflow on a Magnific Spaces board</span></span></button>
           <button class="drop-item" type="button" data-made="ugc"><img src="workflow/ugc.jpg" alt="" width="72" height="54" loading="lazy"><span class="t"><b>Kala Kicks UGC ad</b><span>Product link to ad with Higgsfield MCP and Claude</span></span></button>
           <button class="drop-item" type="button" data-made="westside"><img src="workflow/westside.jpg" alt="" width="72" height="54" loading="lazy"><span class="t"><b>Westside LOV campaign</b><span>18 stills to a timed Seedance 2.5 film</span></span></button>
-          <button class="drop-item" type="button" data-made="catalog"><img src="workflow/catalog.jpg" alt="" width="72" height="54" loading="lazy"><span class="t"><b>Catalog image generator</b><span>110-node ComfyUI graph, one flat lay to five shots</span></span></button>
+          <button class="drop-item" type="button" data-made="catalog"><img src="workflow/catalog-w.jpg" alt="" width="72" height="54" loading="lazy"><span class="t"><b>Catalog image generator</b><span>192-node ComfyUI graph, one flat lay to five shots</span></span></button>
         </div>
       </li>
       <li><a class="nav-link nav-resume" href="resume.pdf" target="_blank" rel="noopener" data-sec="resume"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>Resume</a></li>
@@ -898,15 +898,15 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
       <div class="wrap">
         <div class="ws-head">
           <div class="ws-copy">
-            <div class="kick" data-rise><b>04</b> · ComfyUI · catalogue images · personal tool · 3:4</div>
-            <h2 id="catTitle" data-rise>One flat lay in, five catalogue shots out, from a single ComfyUI run.</h2>
-            <p class="lede" data-rise>A 110-node ComfyUI graph on Comfy Cloud. Pick one of four AI actors, drop in a flat lay, press Run: Nano Banana Pro renders five 3:4 catalogue angles at 2K. DWPose passes only a pose skeleton to the model, so the reference model's face and clothes never leak in.</p>
+            <div class="kick" data-rise><b>04</b> · ComfyUI · women's catalogue images · personal tool · 3:4</div>
+            <h2 id="catTitle" data-rise>One flat lay in, five catalogue shots out, all on one studio backdrop.</h2>
+            <p class="lede" data-rise>A 192-node ComfyUI graph on Comfy Cloud. Pick an AI actor, drop in a flat lay, press Run: GPT Image 2.5 renders five 3:4 shots, each posed from a library photo. DWPose passes only the skeleton, so the reference model's face and clothes never leak in. A grey-card grade (SAM3 masks and a GLSL shader) then matches every backdrop to one studio plate without cutting anyone out.</p>
           </div>
           <div class="ws-side">
             <div class="feat-facts" data-rise>
               <div><b>5</b><span>Shots per run</span></div>
-              <div><b>110</b><span>Nodes in the graph</span></div>
-              <div><b>≈37</b><span>Credits per shot</span></div>
+              <div><b>192</b><span>Nodes in the graph</span></div>
+              <div><b>≈39</b><span>Credits per shot</span></div>
             </div>
             <div class="ugc-actions" data-rise>
               <button class="btn btn-light" type="button" id="catWatch">Watch the process with sound</button>
@@ -916,24 +916,24 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
         </div>
         <figure class="cat-proc">
           <button class="ugc-screen" id="catProc" type="button" aria-label="Open the catalog workflow video with sound">
-            <video id="catV" data-src="workflow/catalog.mp4" poster="workflow/catalog.jpg" muted loop playsinline preload="none"></video>
+            <video id="catV" data-src="workflow/catalog-w.mp4" poster="workflow/catalog-w.jpg" muted loop playsinline preload="none"></video>
             <span class="tag">Process · 30 s · motion in code</span>
           </button>
           <figcaption class="ugc-cap">The ComfyUI canvas, rebuilt from the workflow file and run node by node</figcaption>
         </figure>
         <ol class="ugc-steps ws-steps" id="catSteps" aria-label="Chapters of the catalog workflow video" data-rise>
           <li><button type="button" data-t="0" data-end="3.2"><span class="n">01</span><span>Build the graph</span><i></i></button></li>
-          <li><button type="button" data-t="3.2" data-end="8.2"><span class="n">02</span><span>Stack the references</span><i></i></button></li>
-          <li><button type="button" data-t="8.2" data-end="13.2"><span class="n">03</span><span>Turn poses into skeletons</span><i></i></button></li>
-          <li><button type="button" data-t="13.2" data-end="18.6"><span class="n">04</span><span>Look up the seat</span><i></i></button></li>
-          <li><button type="button" data-t="18.6" data-end="25.5"><span class="n">05</span><span>Render five shots</span><i></i></button></li>
+          <li><button type="button" data-t="3.2" data-end="8.0"><span class="n">02</span><span>Stack the references</span><i></i></button></li>
+          <li><button type="button" data-t="8.0" data-end="12.6"><span class="n">03</span><span>Turn poses into skeletons</span><i></i></button></li>
+          <li><button type="button" data-t="12.6" data-end="18.3"><span class="n">04</span><span>Generate with GPT Image 2.5</span><i></i></button></li>
+          <li><button type="button" data-t="18.3" data-end="26.5"><span class="n">05</span><span>Grade to one backdrop</span><i></i></button></li>
         </ol>
         <div class="cat-shots" id="catShots" role="group" aria-label="The five shots from one run">
-          <figure><img src="workflow/catalog/01.jpg" alt="Full body, front. AI model in a taupe knit sweater, cream trousers and brown derbies on a grey studio floor." width="900" height="1206" loading="lazy"><figcaption><b>01</b>Full body</figcaption></figure>
-          <figure><img src="workflow/catalog/02.jpg" alt="Upper torso. The model sits on a spindle-back wooden chair, hand raised to his temple." width="900" height="1206" loading="lazy"><figcaption><b>02</b>Upper torso</figcaption></figure>
-          <figure><img src="workflow/catalog/03.jpg" alt="Full body, back view of the same outfit." width="900" height="1206" loading="lazy"><figcaption><b>03</b>Back</figcaption></figure>
-          <figure><img src="workflow/catalog/04.jpg" alt="Half side view, the model turned three-quarters to camera." width="900" height="1206" loading="lazy"><figcaption><b>04</b>Half side</figcaption></figure>
-          <figure><img src="workflow/catalog/05.jpg" alt="Close-up from neck to waist showing the knit texture and stone pendant." width="900" height="1206" loading="lazy"><figcaption><b>05</b>Close-up</figcaption></figure>
+          <figure><img src="workflow/catalog-w/01.jpg" alt="Full body. AI model in an open brown linen shirt, cream ribbed tank and cream pleated trousers, seated on a white cube on a light-grey studio backdrop." width="900" height="1205" loading="lazy"><figcaption><b>01</b>Seated, cube</figcaption></figure>
+          <figure><img src="workflow/catalog-w/02.jpg" alt="Waist-up. The model smiles and pulls the shirt collar out at both shoulders." width="900" height="1205" loading="lazy"><figcaption><b>02</b>Collar pull</figcaption></figure>
+          <figure><img src="workflow/catalog-w/03.jpg" alt="Back view to mid-thigh, the model looking back over her shoulder, hand on her hip." width="900" height="1205" loading="lazy"><figcaption><b>03</b>Back</figcaption></figure>
+          <figure><img src="workflow/catalog-w/04.jpg" alt="Full body. The model laughs, seated on a pale wooden step stool, holding her ankles." width="900" height="1205" loading="lazy"><figcaption><b>04</b>Step stool</figcaption></figure>
+          <figure><img src="workflow/catalog-w/05.jpg" alt="Three-quarter. The model sits tall on a black bar stool, hands resting between her knees." width="900" height="1205" loading="lazy"><figcaption><b>05</b>Bar stool</figcaption></figure>
         </div>
       </div>
     </section>
@@ -984,7 +984,7 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
           <div class="ratios">
             <figure style="--ar:0.5625"><i role="img" aria-label="Neeman's loafer frame, 9:16" style="background-image:url(clips/loafer.jpg)"></i><span><b>9:16</b> Neeman's</span></figure>
             <figure style="--ar:0.8"><i role="img" aria-label="Mufti catalogue frame, 4:5" style="background-image:url(clips/mf1.jpg)"></i><span><b>4:5</b> Mufti</span></figure>
-            <figure style="--ar:0.75"><i role="img" aria-label="Catalogue shot, 3:4" style="background-image:url(workflow/catalog/01.jpg)"></i><span><b>3:4</b> Catalog</span></figure>
+            <figure style="--ar:0.75"><i role="img" aria-label="Catalogue shot, 3:4" style="background-image:url(workflow/catalog-w/01.jpg)"></i><span><b>3:4</b> Catalog</span></figure>
             <figure style="--ar:1.7778"><i role="img" aria-label="Westside film frame, 16:9" style="background-image:url(clips/westside.jpg)"></i><span><b>16:9</b> Westside, spec</span></figure>
           </div>
         </div>
@@ -1263,10 +1263,10 @@ footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-s
       stages:[['Hook',0],['01 Stills',2],['02 Shuffle',6],['03 Prompt',10],['04 Camera',15],['05 QC',20],['End',24.4]],
       stats:[['18','Stills'],['6','Outfits'],['18','Timed beats'],['3.5×','More camera motion'],['4','Renders'],['1','Film']],
       board:null, film:'westside', filmLabel:'Watch the finished film'},
-    catalog:{portrait:false, src:'workflow/catalog.mp4', poster:'workflow/catalog.jpg', dur:30,
-      kick:'<b>How it was made</b> · ComfyUI + Nano Banana Pro · 30 s', title:'From one flat lay to five catalogue shots, in one run.',
-      stages:[['Graph',0],['01 Inputs',3.2],['02 Skeletons',8.2],['03 Seat',13.2],['04 Render',18.6],['End',25.5]],
-      stats:[['110','Nodes'],['131','Links'],['14','Pose photos'],['5','Shots per run'],['≈37','Credits per shot'],['1','Flat lay in']],
+    catalog:{portrait:false, src:'workflow/catalog-w.mp4', poster:'workflow/catalog-w.jpg', dur:30,
+      kick:'<b>How it was made</b> · ComfyUI + GPT Image 2.5 · 30 s', title:'From one flat lay to five catalogue shots on one backdrop.',
+      stages:[['Graph',0],['01 Inputs',3.2],['02 Skeletons',8.0],['03 Generate',12.6],['04 Grade',18.3],['End',26.5]],
+      stats:[['192','Nodes'],['260','Links'],['8','Pose photos'],['5','Shots per run'],['≈39','Credits per shot'],['1','Flat lay in']],
       board:null, film:null, filmLabel:''}
   };
   var wf = document.getElementById('wf'), wfV = document.getElementById('wfV'), rail = document.getElementById('madeRail'), wfLast = null, wfRaf = 0, wfKey = null, railBtns = [];
